@@ -1,0 +1,73 @@
+{
+"catalogo_prefixos": [
+	{
+		"id_prefixo" : 1,
+		"prefixo" : "COIR",
+		"descricao" : "Peças de comunicação e rede",
+		"funcao_operacional" : "Cabos, módulos de rede, roteadores, conectores",
+		"exemplo_uso" : "Manutenção de rede BBTS"
+	},
+	{
+		"id_prefixo" : 2,
+		"prefixo" : "JOVR",
+		"descricao" : "Itens de escritório e veículos",
+		"funcao_operacional" : "Cadeiras, suportes, ferramentas, cofres",
+		"exemplo_uso" : "Suporte operacional e logístico"
+	},
+	{
+		"id_prefixo" : 3,
+		"prefixo" : "QOKR",
+		"descricao" : "Módulos eletrônicos e hardware",
+		"funcao_operacional" : "Placas, fontes, sensores, controladoras",
+		"exemplo_uso" : "Caixas eletrônicos e automação bancária"
+	},
+	{
+		"id_prefixo" : 4,
+		"prefixo" : "FOQR",
+		"descricao" : "Fontes e reguladores de energia",
+		"funcao_operacional" : "Transformadores, cabos, conversores",
+		"exemplo_uso" : "Equipamentos técnicos e racks"
+	},
+	{
+		"id_prefixo" : 5,
+		"prefixo" : "IOKR",
+		"descricao" : "Interfaces ópticas e dados",
+		"funcao_operacional" : "Módulos SFP, splitters, cabos de fibra",
+		"exemplo_uso" : "Datacenter e telecom"
+	},
+	{
+		"id_prefixo" : 6,
+		"prefixo" : "ROXR",
+		"descricao" : "Revestimentos e componentes mecânicos",
+		"funcao_operacional" : "Carcaças, tampas, estruturas",
+		"exemplo_uso" : "Manutenção física de equipamentos"
+	},
+	{
+		"id_prefixo" : 7,
+		"prefixo" : "VQKR",
+		"descricao" : "Ventilação e refrigeração",
+		"funcao_operacional" : "Coolers, ventoinhas, dissipadores",
+		"exemplo_uso" : "Controle térmico de hardware"
+	},
+	{
+		"id_prefixo" : 8,
+		"prefixo" : "NAIR",
+		"descricao" : "Networking e infraestrutura",
+		"funcao_operacional" : "Switches, extensores, racks",
+		"exemplo_uso" : "Rede corporativa"
+	},
+	{
+		"id_prefixo" : 9,
+		"prefixo" : "WRCR",
+		"descricao" : "Work Request \/ Componentes de Reparo",
+		"funcao_operacional" : "Kits e peças de reposição",
+		"exemplo_uso" : "Logística reversa e laboratório"
+	},
+	{
+		"id_prefixo" : 10,
+		"prefixo" : "PECR",
+		"descricao" : "Peças elétricas diversas",
+		"funcao_operacional" : "Cabos e conectores elétricos",
+		"exemplo_uso" : "Instalação e manutenção predial"
+	}
+]}

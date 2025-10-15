@@ -1,0 +1,195 @@
+{
+"catalogo_sap_bbts": [
+	{
+		"id" : 1,
+		"codigo" : "MM01",
+		"tipo" : "Transação SAP",
+		"descricao_funcional" : "Criação de material",
+		"finalidade" : "Cadastrar novo material no catálogo técnico",
+		"exemplo_pratico" : "Cadastrar novo item QOKR-050000"
+	},
+	{
+		"id" : 2,
+		"codigo" : "MM02",
+		"tipo" : "Transação SAP",
+		"descricao_funcional" : "Alteração de material",
+		"finalidade" : "Alterar dados do material existente",
+		"exemplo_pratico" : "Atualizar fornecedor do item QOKR-051196"
+	},
+	{
+		"id" : 3,
+		"codigo" : "MM03",
+		"tipo" : "Transação SAP",
+		"descricao_funcional" : "Visualização de material",
+		"finalidade" : "Consultar ficha técnica e estoque do material",
+		"exemplo_pratico" : "Ver detalhes do item COIR-062127"
+	},
+	{
+		"id" : 4,
+		"codigo" : "MB52",
+		"tipo" : "Transação SAP",
+		"descricao_funcional" : "Relatório de estoque",
+		"finalidade" : "Listar saldos de materiais por centro e depósito",
+		"exemplo_pratico" : "Auditar saldo de estoque BBTS"
+	},
+	{
+		"id" : 5,
+		"codigo" : "ME51N",
+		"tipo" : "Transação SAP",
+		"descricao_funcional" : "Requisição de compra",
+		"finalidade" : "Criar solicitação interna de compra",
+		"exemplo_pratico" : "Gerar RC para módulo de rede COIR"
+	},
+	{
+		"id" : 6,
+		"codigo" : "ME21N",
+		"tipo" : "Transação SAP",
+		"descricao_funcional" : "Pedido de compra",
+		"finalidade" : "Gerar pedido de compra baseado na RC",
+		"exemplo_pratico" : "Emitir pedido de compra para fornecedor"
+	},
+	{
+		"id" : 7,
+		"codigo" : "ME23N",
+		"tipo" : "Transação SAP",
+		"descricao_funcional" : "Visualizar pedido de compra",
+		"finalidade" : "Acompanhar status e entrega de pedidos",
+		"exemplo_pratico" : "Ver situação do pedido BBTS nº12345"
+	},
+	{
+		"id" : 8,
+		"codigo" : "MB1A",
+		"tipo" : "Transação SAP",
+		"descricao_funcional" : "Saída de material",
+		"finalidade" : "Registrar saída de estoque para consumo",
+		"exemplo_pratico" : "Dar baixa em material enviado para agência"
+	},
+	{
+		"id" : 9,
+		"codigo" : "MB1B",
+		"tipo" : "Transação SAP",
+		"descricao_funcional" : "Transferência de material",
+		"finalidade" : "Transferir material entre centros ou depósitos",
+		"exemplo_pratico" : "Mover peças entre Recife e Salvador"
+	},
+	{
+		"id" : 10,
+		"codigo" : "MB1C",
+		"tipo" : "Transação SAP",
+		"descricao_funcional" : "Entrada inicial de estoque",
+		"finalidade" : "Registrar estoque inicial de materiais",
+		"exemplo_pratico" : "Cadastrar estoque inicial após inventário"
+	},
+	{
+		"id" : 11,
+		"codigo" : "ZMM03",
+		"tipo" : "Transação Z (customizada)",
+		"descricao_funcional" : "Visualização ampliada de material",
+		"finalidade" : "Exibe informações adicionais de manutenção e consumo",
+		"exemplo_pratico" : "Ver histórico técnico do item COIR-062127"
+	},
+	{
+		"id" : 12,
+		"codigo" : "ZMM07",
+		"tipo" : "Transação Z (customizada)",
+		"descricao_funcional" : "Consolidação logística e devoluções",
+		"finalidade" : "Gerar relatórios de movimentações e devoluções",
+		"exemplo_pratico" : "Fechamento de remessas e devoluções de peças"
+	},
+	{
+		"id" : 13,
+		"codigo" : "ZINV01",
+		"tipo" : "Transação Z (customizada)",
+		"descricao_funcional" : "Inventário técnico BBTS",
+		"finalidade" : "Conciliação física e sistêmica de estoque",
+		"exemplo_pratico" : "Auditoria de estoque físico em datacenter"
+	},
+	{
+		"id" : 14,
+		"codigo" : "ZREP01",
+		"tipo" : "Transação Z (customizada)",
+		"descricao_funcional" : "Relatório de reposição automática",
+		"finalidade" : "Identifica itens com saldo abaixo do CMM",
+		"exemplo_pratico" : "Listar materiais com necessidade de compra automática"
+	},
+	{
+		"id" : 15,
+		"codigo" : "COIR",
+		"tipo" : "Prefixo de material",
+		"descricao_funcional" : "Peças de comunicação e rede",
+		"finalidade" : "Itens de telecomunicações e conectividade",
+		"exemplo_pratico" : "Cabos, modems, antenas, conectores"
+	},
+	{
+		"id" : 16,
+		"codigo" : "JOVR",
+		"tipo" : "Prefixo de material",
+		"descricao_funcional" : "Itens de escritório e veículos",
+		"finalidade" : "Materiais de apoio e mobiliário",
+		"exemplo_pratico" : "Cadeiras, ferramentas, cofres"
+	},
+	{
+		"id" : 17,
+		"codigo" : "QOKR",
+		"tipo" : "Prefixo de material",
+		"descricao_funcional" : "Módulos eletrônicos e hardware",
+		"finalidade" : "Componentes eletrônicos e automação",
+		"exemplo_pratico" : "Placas, fontes, sensores, controladoras"
+	},
+	{
+		"id" : 18,
+		"codigo" : "FOQR",
+		"tipo" : "Prefixo de material",
+		"descricao_funcional" : "Fontes e reguladores de energia",
+		"finalidade" : "Alimentação e energia técnica",
+		"exemplo_pratico" : "Fontes AC\/DC, transformadores"
+	},
+	{
+		"id" : 19,
+		"codigo" : "IOKR",
+		"tipo" : "Prefixo de material",
+		"descricao_funcional" : "Interfaces ópticas e dados",
+		"finalidade" : "Módulos e cabos ópticos",
+		"exemplo_pratico" : "SFP, splitters, conectores"
+	},
+	{
+		"id" : 20,
+		"codigo" : "ROXR",
+		"tipo" : "Prefixo de material",
+		"descricao_funcional" : "Componentes mecânicos",
+		"finalidade" : "Revestimentos e suportes físicos",
+		"exemplo_pratico" : "Painéis, tampas, estruturas metálicas"
+	},
+	{
+		"id" : 21,
+		"codigo" : "VQKR",
+		"tipo" : "Prefixo de material",
+		"descricao_funcional" : "Ventilação e refrigeração",
+		"finalidade" : "Controle térmico e dissipação de calor",
+		"exemplo_pratico" : "Coolers, ventoinhas, dissipadores"
+	},
+	{
+		"id" : 22,
+		"codigo" : "NAIR",
+		"tipo" : "Prefixo de material",
+		"descricao_funcional" : "Networking e infraestrutura",
+		"finalidade" : "Racks e equipamentos de rede",
+		"exemplo_pratico" : "Switches, extensores, patch panels"
+	},
+	{
+		"id" : 23,
+		"codigo" : "WRCR",
+		"tipo" : "Prefixo de material",
+		"descricao_funcional" : "Componentes de reparo",
+		"finalidade" : "Peças de reposição e kits de manutenção",
+		"exemplo_pratico" : "Kits de conserto e substituição"
+	},
+	{
+		"id" : 24,
+		"codigo" : "PECR",
+		"tipo" : "Prefixo de material",
+		"descricao_funcional" : "Peças elétricas diversas",
+		"finalidade" : "Componentes de instalação elétrica",
+		"exemplo_pratico" : "Cabos, plugues e conectores elétricos"
+	}
+]}

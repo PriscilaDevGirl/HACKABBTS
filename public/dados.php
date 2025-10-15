@@ -1,25 +1,31 @@
 <?php
 /*****************************************************
  * dashboard_bbaib.php
- * Painel único: lista + gráficos (responsivo)
- * DB: bbaib | user: root | senha: (vazia)
+ * Versão sem banco de dados
+ * Lê os arquivos JSON:
+ *   - catalogo_prefixos.json
+ *   - catalogo_sap_bbts.json
  *****************************************************/
 
 header('Content-Type: text/html; charset=utf-8');
 
-/* ========= CONEXÃO ========= */
-require_once __DIR__ . '/../config.php';
-$mysqli = @new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-if ($mysqli->connect_errno) {
-    http_response_code(500);
-    echo "<h1>Erro de conexão</h1><pre>{$mysqli->connect_error}</pre>";
-    exit;
+// ===== Carregar JSON =====
+function carregarJSON($arquivo) {
+    if (!file_exists($arquivo)) {
+        echo "<h3 style='color:red'>❌ Arquivo não encontrado: {$arquivo}</h3>";
+        return [];
+    }
+    $conteudo = file_get_contents($arquivo);
+    $dados = json_decode($conteudo, true);
+    if (!is_array($dados)) {
+        echo "<h3 style='color:red'>❌ Erro ao ler JSON: {$arquivo}</h3>";
+        return [];
+    }
+    return $dados;
 }
-$mysqli->set_charset("utf8mb4");
 
-// ===== Consultas =====
-$prefixos = $mysqli->query("SELECT prefixo, descricao, funcao_operacional, exemplo_uso FROM catalogo_prefixos ORDER BY prefixo ASC");
-$catalogo = $mysqli->query("SELECT codigo, tipo, descricao_funcional, finalidade, exemplo_pratico FROM catalogo_sap_bbts ORDER BY codigo ASC");
+$prefixos = carregarJSON(__DIR__ . "../dados/catalogo_prefixos.json");
+$catalogo = carregarJSON(__DIR__ . "../dados/catalogo_sap_bbts.json");
 ?>
 
 <!DOCTYPE html>
@@ -85,9 +91,7 @@ footer {
   table, thead, tbody, th, td, tr {
     display: block;
   }
-  thead tr {
-    display: none;
-  }
+  thead tr { display: none; }
   td {
     padding: 10px;
     border: none;
@@ -117,14 +121,14 @@ footer {
       </tr>
     </thead>
     <tbody>
-      <?php while($p = $prefixos->fetch_assoc()): ?>
+      <?php foreach ($prefixos as $p): ?>
       <tr>
-        <td data-label="Prefixo"><?= htmlspecialchars($p['prefixo']) ?></td>
-        <td data-label="Descrição"><?= htmlspecialchars($p['descricao']) ?></td>
-        <td data-label="Função"><?= htmlspecialchars($p['funcao_operacional']) ?></td>
-        <td data-label="Exemplo"><?= htmlspecialchars($p['exemplo_uso']) ?></td>
+        <td data-label="Prefixo"><?= htmlspecialchars($p['prefixo'] ?? '') ?></td>
+        <td data-label="Descrição"><?= htmlspecialchars($p['descricao'] ?? '') ?></td>
+        <td data-label="Função"><?= htmlspecialchars($p['funcao_operacional'] ?? '') ?></td>
+        <td data-label="Exemplo"><?= htmlspecialchars($p['exemplo_uso'] ?? '') ?></td>
       </tr>
-      <?php endwhile; ?>
+      <?php endforeach; ?>
     </tbody>
   </table>
 </div>
@@ -142,15 +146,15 @@ footer {
       </tr>
     </thead>
     <tbody>
-      <?php while($c = $catalogo->fetch_assoc()): ?>
+      <?php foreach ($catalogo as $c): ?>
       <tr>
-        <td data-label="Código"><?= htmlspecialchars($c['codigo']) ?></td>
-        <td data-label="Tipo"><?= htmlspecialchars($c['tipo']) ?></td>
-        <td data-label="Descrição"><?= htmlspecialchars($c['descricao_funcional']) ?></td>
-        <td data-label="Finalidade"><?= htmlspecialchars($c['finalidade']) ?></td>
-        <td data-label="Exemplo"><?= htmlspecialchars($c['exemplo_pratico']) ?></td>
+        <td data-label="Código"><?= htmlspecialchars($c['codigo'] ?? '') ?></td>
+        <td data-label="Tipo"><?= htmlspecialchars($c['tipo'] ?? '') ?></td>
+        <td data-label="Descrição"><?= htmlspecialchars($c['descricao_funcional'] ?? '') ?></td>
+        <td data-label="Finalidade"><?= htmlspecialchars($c['finalidade'] ?? '') ?></td>
+        <td data-label="Exemplo"><?= htmlspecialchars($c['exemplo_pratico'] ?? '') ?></td>
       </tr>
-      <?php endwhile; ?>
+      <?php endforeach; ?>
     </tbody>
   </table>
 </div>
