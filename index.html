@@ -1,12 +1,614 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Olá Mundo 3</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>BBIAB - Inteligência Operacional</title>
+
+<style>
+  /* --- Palette / tokens --- */
+  :root{
+    --brand-color-primary-pure: #465EFF;
+    --brand-color-primary-light: #C2D6FF;
+    --brand-color-primary-dark: #262E89;
+
+    --brand-color-secondary-pure: #FCFC30;
+    --brand-color-secondary-light: #FAFEC3;
+    --brand-color-secondary-dark: #C9A905;
+
+    --highlight-color: #54DCFC;
+
+    --neutral-color-lightest: #FAFAFA;
+    --neutral-color-lighter: #E4E4E7;
+    --neutral-color-light: #D4D4D8;
+    --neutral-color-medium: #71717B;
+    --neutral-color-dark: #3F3F46;
+    --neutral-color-darker: #27272A;
+    --neutral-color-darkest: #09090B;
+
+    --feedback-color-success: #23D80A;
+    --feedback-color-warning: #F99207;
+    --feedback-color-danger: #FF2E3B;
+
+    --radius: 12px;
+    --glass: rgba(255,255,255,0.95);
+    --card-shadow: 0 6px 18px rgba(15,23,42,0.06);
+    --max-width: 1280px;
+  }
+
+  /* Accessibility mode tokens (switched with .a11y-high-contrast) */
+  .a11y-high-contrast {
+    --neutral-color-lightest: #ffffff;
+    --neutral-color-lighter: #f3f4f6;
+    --neutral-color-light: #e5e7eb;
+    --neutral-color-medium: #111827;
+    --neutral-color-dark: #000000;
+  }
+
+  /* Reset */
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: var(--neutral-color-lightest);
+    color: var(--neutral-color-dark);
+    display:flex;
+    min-height:100vh;
+    line-height:1.35;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* Sidebar */
+  .sidebar{
+    width:260px;
+    background: linear-gradient(180deg,var(--neutral-color-darker), #1f1f1f);
+    color: #fff;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  .brand {
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .logo {
+    width:44px;height:36px;border-radius:6px;
+    background:linear-gradient(135deg,var(--brand-color-primary-pure), var(--brand-color-primary-dark));
+    display:flex;align-items:center;justify-content:center;font-weight:700;
+    color: #fff;font-size:14px;
+    box-shadow: 0 6px 16px rgba(70,94,255,0.12);
+  }
+  .brand-title { font-weight:700; font-size:18px; color: #fff; }
+  .sidebar .muted { color: rgba(255,255,255,0.7); font-size:12px; margin-top:6px; }
+
+  .nav {
+    margin-top:8px; display:flex; flex-direction:column; gap:8px; flex:1;
+  }
+  .nav button {
+    display:flex; align-items:center; gap:12px; border:none; background:none;
+    color: rgba(255,255,255,0.9); padding:10px 12px; border-radius:10px; cursor:pointer;
+    text-align:left; font-size:15px; transition: all .15s ease;
+  }
+  .nav button:hover { background: rgba(255,255,255,0.04); transform: translateY(-1px); }
+  .nav button[aria-current="true"]{ background:var(--brand-color-primary-pure); box-shadow: 0 6px 18px rgba(70,94,255,0.18); color:#fff; }
+
+  .sidebar-footer {
+    font-size:12px; color: rgba(255,255,255,0.65);
+    border-top:1px solid rgba(255,255,255,0.04); padding-top:12px;
+  }
+
+  /* Main layout */
+  .main {
+    flex:1; display:flex; flex-direction:column; min-height:100vh;
+  }
+
+  header.topbar{
+    background: #fff; border-bottom:1px solid var(--neutral-color-lighter);
+    padding:12px 28px; display:flex; align-items:center; gap:20px; justify-content:space-between;
+    position:sticky; top:0; z-index:40;
+  }
+  .search {
+    display:flex; align-items:center; gap:10px; background:var(--neutral-color-lightest);
+    border:1px solid var(--neutral-color-light); padding:10px 12px; border-radius:10px;
+    max-width:700px; width:100%;
+  }
+  .search input {
+    border:0; outline:0; font-size:14px; color:var(--neutral-color-medium);
+    background:transparent; width:100%;
+  }
+  .header-actions { display:flex; gap:18px; align-items:center; }
+
+  .notif { position:relative; font-size:20px; cursor:pointer; }
+  .badge { position:absolute; top:-6px; right:-6px; background:var(--feedback-color-danger); color:white;
+           width:20px; height:20px; border-radius:50%; display:flex;align-items:center;justify-content:center;
+           font-size:12px; font-weight:700; box-shadow:0 4px 10px rgba(0,0,0,0.12); }
+
+  .profile { display:flex; align-items:center; gap:12px; }
+  .profile .meta { font-size:13px; color:var(--neutral-color-medium); }
+  .avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#667eea,#764ba2);
+             display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700; }
+
+  /* Content area */
+  .content { padding:28px; max-width:var(--max-width); margin:0 auto; width:100%; }
+
+  .welcome { margin-bottom:18px; }
+  .welcome h1 { font-size:28px; color:var(--neutral-color-dark); margin-bottom:6px; }
+  .welcome p { color:var(--neutral-color-medium); font-size:14px; }
+
+  /* Cards grid */
+  .cards {
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    gap:18px; margin-bottom:22px;
+  }
+  .card {
+    background:var(--glass); border-radius:var(--radius); padding:20px; box-shadow:var(--card-shadow);
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .card .meta-row { display:flex; justify-content:space-between; align-items:flex-start; }
+  .card .title { color:var(--neutral-color-medium); font-weight:700; font-size:13px; }
+  .card .icon { font-size:20px; color:var(--brand-color-primary-pure); }
+  .card .value { font-size:28px; font-weight:800; color:var(--neutral-color-dark); }
+  .card .delta { font-weight:700; font-size:13px; display:inline-flex;gap:8px; align-items:center; }
+  .delta.positive { color: var(--feedback-color-success); }
+  .delta.negative { color: var(--feedback-color-danger); }
+  .delta.neutral { color: var(--neutral-color-medium); }
+
+  /* Charts area */
+  .panels {
+    display:grid; grid-template-columns: 2fr 1fr; gap:18px; margin-bottom:22px;
+  }
+  .chart {
+    background:var(--glass); border-radius:var(--radius); padding:20px; box-shadow:var(--card-shadow);
+  }
+  .chart h3 { font-size:16px; color:var(--neutral-color-dark); margin-bottom:10px; }
+  .chart .placeholder { height:260px; border-radius:8px; background:linear-gradient(180deg, rgba(70,94,255,0.08), rgba(84,220,252,0.02)); display:flex; align-items:center; justify-content:center; color:#8b93b2; font-size:14px; }
+
+  /* Alerts column */
+  .alerts { display:flex; flex-direction:column; gap:10px; }
+  .alert {
+    background: linear-gradient(90deg, rgba(255,242,242,1), #fff8f8);
+    padding:12px; border-radius:10px; display:flex; gap:12px; align-items:flex-start; border-left:4px solid var(--feedback-color-danger);
+  }
+  .alert .dot { width:36px;height:36px;border-radius:8px;background:var(--feedback-color-danger);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700; }
+
+  /* Data table */
+  .table-card { background:var(--glass); border-radius:var(--radius); padding:18px; box-shadow:var(--card-shadow); margin-bottom:30px; }
+  .table-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .table-header h4 { font-size:16px; color:var(--neutral-color-dark); }
+  .table-actions { display:flex; gap:10px; }
+  .btn { padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; font-size:13px; }
+  .btn-outline { background:transparent; border:1px solid var(--neutral-color-light); color:var(--neutral-color-dark); }
+  .btn-primary { background:var(--brand-color-primary-pure); color:white; box-shadow: 0 8px 20px rgba(70,94,255,0.12); }
+  table.data { width:100%; border-collapse:collapse; font-size:14px; }
+  table.data thead th { text-align:left; padding:10px 8px; color:var(--neutral-color-medium); font-weight:700; border-bottom:1px solid var(--neutral-color-light); }
+  table.data tbody td { padding:12px 8px; border-bottom:1px solid var(--neutral-color-lighter); color:var(--neutral-color-dark); }
+
+  .status-badge { padding:6px 8px; border-radius:8px; font-weight:800; font-size:13px; display:inline-block; }
+  .status-critical { background: #fff0f0; color: var(--feedback-color-danger); }
+  .status-warning { background: #fff7ed; color: var(--feedback-color-warning); }
+  .status-normal { background: #f0fff4; color: var(--feedback-color-success); }
+
+  .pagination { display:flex; gap:8px; margin-top:14px; align-items:center; }
+
+  /* Assistant modal (simulated IA) */
+  .assist-btn { position:fixed; right:28px; bottom:28px; z-index:60; background:linear-gradient(135deg,var(--brand-color-primary-pure),var(--brand-color-primary-dark)); color:#fff; border:none; padding:14px 18px; border-radius:14px; cursor:pointer; box-shadow:0 10px 30px rgba(70,94,255,0.18); display:flex; gap:10px; align-items:center; }
+  .assist-modal { position:fixed; right:28px; bottom:90px; width:360px; max-height:70vh; background:#fff; border-radius:12px; box-shadow:0 20px 50px rgba(0,0,0,0.18); overflow:hidden; display:flex; flex-direction:column; z-index:70; }
+  .assist-header { padding:12px 14px; background:var(--brand-color-primary-pure); color:#fff; display:flex; justify-content:space-between; align-items:center; }
+  .assist-body { padding:12px; display:flex; flex-direction:column; gap:8px; overflow:auto; }
+  .msg { padding:10px 12px; border-radius:12px; max-width:85%; }
+  .msg.ai { background:#f4f7ff; color:var(--neutral-color-dark); align-self:flex-start; }
+  .msg.user { background:var(--brand-color-primary-pure); color:#fff; align-self:flex-end; }
+  .assist-input { display:flex; gap:8px; padding:10px; border-top:1px solid var(--neutral-color-lighter); }
+  .assist-input input { flex:1; padding:10px; border-radius:10px; border:1px solid var(--neutral-color-light); outline:none; }
+
+  /* Accessibility controls */
+  .a11y-controls { display:flex; gap:8px; align-items:center; }
+  .a11y-controls button{ background:#fff;padding:6px 8px;border-radius:8px;border:1px solid var(--neutral-color-light); cursor:pointer; font-size:13px; }
+
+  /* Responsive */
+  @media (max-width:1000px){
+    .sidebar{ display:none }
+    .content{ padding:18px }
+    .panels{ grid-template-columns:1fr }
+  }
+</style>
 </head>
 <body>
-  <h1>Olá, Mundo!</h1>
-  <p>Bem-vindo ao seu primeiro código HTML 😄</p>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" aria-label="Barra lateral de navegação">
+    <div class="brand" role="banner">
+      <div class="logo" aria-hidden="true">BBIAB</div>
+      <div>
+        <div class="brand-title">BBIAB</div>
+        <div class="muted">Inteligência Operacional</div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Menu principal">
+      <button aria-current="true"><span>📊</span> Dashboard</button>
+      <button><span>📈</span> Analytics</button>
+      <button><span>💬</span> Chat IA</button>
+      <button><span>🔔</span> Alertas</button>
+      <button><span>📋</span> Dados</button>
+      <button><span>⚙️</span> Configurações</button>
+    </nav>
+
+    <div class="sidebar-footer" aria-hidden="true">
+      <div><strong>Versão 1.0</strong></div>
+      <div style="margin-top:6px;">Powered by Azure AI</div>
+    </div>
+  </aside>
+
+  <!-- Main area -->
+  <div class="main" role="main">
+
+    <!-- Top bar -->
+    <header class="topbar" role="region" aria-label="Barra superior">
+      <div style="flex:1;display:flex;gap:16px;align-items:center;">
+        <div class="search" role="search" aria-label="Buscar materiais">
+          <span aria-hidden="true">🔍</span>
+          <input id="searchInput" type="search" placeholder="Buscar materiais, contratos, insights..." aria-label="Buscar materiais, contratos, insights"/>
+        </div>
+      </div>
+
+      <div class="header-actions" role="group" aria-label="Ações do usuário">
+        <div class="notif" role="button" aria-label="Notificações" tabindex="0">
+          🔔 <span class="badge" aria-live="polite">5</span>
+        </div>
+
+        <div class="profile" aria-label="Informações do usuário">
+          <div style="text-align:right;">
+            <div style="font-weight:800">Admin BBTS</div>
+            <div style="font-size:13px;color:var(--neutral-color-medium)">Gerente de Operações</div>
+          </div>
+          <div class="avatar" aria-hidden="true">O</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <section class="content" aria-labelledby="welcome-title">
+      <div class="welcome">
+        <h1 id="welcome-title">Bem-vindo ao BBIAB</h1>
+        <p>Plataforma de Inteligência Operacional com IA</p>
+      </div>
+
+      <!-- Cards -->
+      <div class="cards" aria-hidden="false">
+        <div class="card" role="article" aria-label="Total de Itens em Manutenção">
+          <div class="meta-row">
+            <div class="title">Total de Itens em Manutenção</div>
+            <div class="icon" aria-hidden="true">🔧</div>
+          </div>
+          <div class="value" id="itemsMaint">519</div>
+          <div class="delta positive" aria-live="polite">▲ +8% este mês</div>
+        </div>
+
+        <div class="card" role="article" aria-label="Estoque crítico">
+          <div class="meta-row">
+            <div class="title">Estoque Crítico</div>
+            <div class="icon" aria-hidden="true">⚠️</div>
+          </div>
+          <div class="value" id="criticalStock">27</div>
+          <div class="delta negative">▼ +5 itens hoje</div>
+        </div>
+
+        <div class="card" role="article" aria-label="Economia Identificada">
+          <div class="meta-row">
+            <div class="title">Economia Identificada</div>
+            <div class="icon" aria-hidden="true">💰</div>
+          </div>
+          <div class="value" id="savings">R$ 6557K</div>
+          <div class="delta positive">▲ +8%</div>
+        </div>
+
+        <div class="card" role="article" aria-label="Itens em Trânsito">
+          <div class="meta-row">
+            <div class="title">Itens em Trânsito</div>
+            <div class="icon" aria-hidden="true">🚚</div>
+          </div>
+          <div class="value" id="inTransit">38</div>
+          <div class="delta neutral">Estável</div>
+        </div>
+      </div>
+
+      <!-- Panels: big chart + alerts -->
+      <div class="panels">
+        <div class="chart" role="region" aria-label="Tendência de custos e economias">
+          <h3>Tendência de Custos e Economias</h3>
+          <div class="placeholder" role="img" aria-label="Gráfico de tendência">
+            <!-- Simple inline SVG -->
+            <svg width="100%" height="220" viewBox="0 0 400 220" preserveAspectRatio="none" aria-hidden="true">
+              <polyline fill="none" stroke="url(#g1)" stroke-width="3" points="12,200 72,188 132,162 192,120 252,80 312,44 372,36"/>
+              <defs>
+                <linearGradient id="g1" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#465EFF" stop-opacity="1"/>
+                  <stop offset="100%" stop-color="#54DCFC" stop-opacity="1"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <div class="chart" role="region" aria-label="Alertas inteligentes">
+          <h3>Alertas Inteligentes</h3>
+          <div class="alerts" aria-live="polite">
+            <div class="alert" role="alert">
+              <div class="dot">⚠</div>
+              <div style="flex:1">
+                <div style="font-weight:800">Estoque Crítico</div>
+                <div style="color:var(--neutral-color-medium)">Material ROXR-033849 abaixo do nível de segurança</div>
+              </div>
+              <div style="font-size:13px;color:var(--neutral-color-medium)">Há 15 min</div>
+            </div>
+
+            <div class="alert" role="alert">
+              <div class="dot">⚠</div>
+              <div style="flex:1">
+                <div style="font-weight:800">Alto Custo de Manutenção</div>
+                <div style="color:var(--neutral-color-medium)">Item BOKR-092826 com cmm de 474.17</div>
+              </div>
+              <div style="font-size:13px;color:var(--neutral-color-medium)">Há 1 hora</div>
+            </div>
+
+            <div class="alert" role="alert">
+              <div class="dot">⚠</div>
+              <div style="flex:1">
+                <div style="font-weight:800">Estoque Zerado</div>
+                <div style="color:var(--neutral-color-medium)">5 itens sem estoque disponível</div>
+              </div>
+              <div style="font-size:13px;color:var(--neutral-color-medium)">Há 3 horas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data table -->
+      <div class="table-card" role="region" aria-label="Itens em manutenção">
+        <div class="table-header">
+          <h4>Itens em Manutenção</h4>
+          <div class="table-actions">
+            <button class="btn btn-outline" id="exportBtn" aria-label="Exportar dados">Exportar</button>
+            <button class="btn btn-primary" id="filterBtn" aria-haspopup="true">Filtrar</button>
+          </div>
+        </div>
+
+        <div style="overflow:auto">
+          <table class="data" aria-describedby="tableDesc">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Tipo</th>
+                <th>Saldo Manut.</th>
+                <th>Trânsito</th>
+                <th>Pendente RI</th>
+                <th>CMM</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Rows as provided (static) -->
+              <tr><td>ROXR-033849</td><td>C</td><td>0</td><td>0</td><td>0</td><td>0.17</td><td><span class="status-badge status-critical">Crítico</span></td></tr>
+              <tr><td>AOLR-068182</td><td>C</td><td>26</td><td>0</td><td>0</td><td>0.17</td><td><span class="status-badge status-normal">Normal</span></td></tr>
+              <tr><td>AARO-020619</td><td>C</td><td>34</td><td>0</td><td>8991</td><td>0</td><td><span class="status-badge status-warning">Atenção</span></td></tr>
+              <tr><td>FOAR-068153</td><td>B</td><td>1723</td><td>0</td><td>202</td><td>5.68</td><td><span class="status-badge status-warning">Atenção</span></td></tr>
+              <tr><td>OSCP-083454</td><td>B</td><td>32</td><td>42</td><td>1382</td><td>68.51</td><td><span class="status-badge status-warning">Atenção</span></td></tr>
+              <tr><td>BOKR-092826</td><td>A</td><td>1307</td><td>27</td><td>163</td><td>474.17</td><td><span class="status-badge status-critical">Crítico</span></td></tr>
+              <tr><td>BOQR-033678</td><td>A</td><td>688</td><td>89</td><td>2</td><td>452.5</td><td><span class="status-badge status-critical">Crítico</span></td></tr>
+              <tr><td>SSVP-055242</td><td>B</td><td>2545</td><td>28</td><td>20</td><td>179.67</td><td><span class="status-badge status-warning">Atenção</span></td></tr>
+              <tr><td>TOJR-068250</td><td>C</td><td>3672</td><td>0</td><td>0</td><td>0</td><td><span class="status-badge status-normal">Normal</span></td></tr>
+              <tr><td>QOUR-092468</td><td>C</td><td>3176</td><td>0</td><td>3524</td><td>0</td><td><span class="status-badge status-warning">Atenção</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination" role="navigation" aria-label="Paginação">
+          <button class="btn btn-outline">◀</button>
+          <button class="btn btn-primary">1</button>
+          <button class="btn btn-outline">2</button>
+          <button class="btn btn-outline">3</button>
+          <button class="btn btn-outline">...</button>
+          <button class="btn btn-outline">52</button>
+          <button class="btn btn-outline">▶</button>
+        </div>
+      </div>
+
+      <!-- Accessibility controls -->
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:30px">
+        <div class="a11y-controls" role="region" aria-label="Controles de acessibilidade">
+          <button id="a11yContrast" title="Alto contraste">Alto contraste</button>
+          <button id="a11yBigger" title="Aumentar texto">A+</button>
+          <button id="a11ySmaller" title="Diminuir texto">A-</button>
+          <button id="readBtn" title="Ler página em voz">Ouvir</button>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- Assistente IA (simulado) -->
+  <button class="assist-btn" id="openAssist" aria-haspopup="dialog" aria-controls="assistModal">
+    💬 Assistente IA
+  </button>
+
+  <div class="assist-modal" id="assistModal" role="dialog" aria-modal="true" aria-hidden="true" style="display:none">
+    <div class="assist-header">
+      <div>Assistente IA — TrackVision</div>
+      <button id="closeAssist" aria-label="Fechar assistente" style="background:transparent;border:0;color:#fff;font-weight:800;cursor:pointer">✕</button>
+    </div>
+    <div class="assist-body" id="assistBody" tabindex="0" aria-live="polite">
+      <div class="msg ai">Olá! Posso ajudar a localizar itens, sugerir compras e identificar riscos. Tente: "Onde está ROXR-033849?"</div>
+    </div>
+    <div class="assist-input">
+      <input id="assistInput" placeholder="Pergunte algo... ex: localizar ROXR-033849" aria-label="Mensagem para assistente" />
+      <button id="sendAssist" class="btn btn-primary">Enviar</button>
+    </div>
+  </div>
+
+<script>
+/* -------------------------
+   Simple interactive JS
+   - accessibility toggles
+   - assistant simulated responses using heuristics on static table
+   - export CSV of visible table
+--------------------------*/
+
+/* Accessibility controls */
+const root = document.documentElement;
+const a11yContrastBtn = document.getElementById('a11yContrast');
+const a11yBigger = document.getElementById('a11yBigger');
+const a11ySmaller = document.getElementById('a11ySmaller');
+const readBtn = document.getElementById('readBtn');
+
+a11yContrastBtn.addEventListener('click', ()=> {
+  document.body.classList.toggle('a11y-high-contrast');
+  a11yContrastBtn.setAttribute('aria-pressed', document.body.classList.contains('a11y-high-contrast'));
+});
+
+let baseFont = 16;
+a11yBigger.addEventListener('click', ()=> { baseFont = Math.min(22, baseFont + 1); document.documentElement.style.fontSize = baseFont + 'px'; });
+a11ySmaller.addEventListener('click', ()=> { baseFont = Math.max(12, baseFont - 1); document.documentElement.style.fontSize = baseFont + 'px'; });
+
+/* Read page using Web Speech API (if available) */
+readBtn.addEventListener('click', ()=> {
+  const textElems = [
+    document.getElementById('welcome-title').innerText,
+    document.querySelector('.welcome p').innerText,
+    'Total de itens em manutenção: ' + document.getElementById('itemsMaint').innerText,
+    'Estoque crítico: ' + document.getElementById('criticalStock').innerText,
+    'Economia identificada: ' + document.getElementById('savings').innerText,
+    'Itens em trânsito: ' + document.getElementById('inTransit').innerText
+  ];
+  const utter = new SpeechSynthesisUtterance(textElems.join('. '));
+  utter.lang = 'pt-BR';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+});
+
+/* Assistant modal behavior */
+const openAssist = document.getElementById('openAssist');
+const assistModal = document.getElementById('assistModal');
+const closeAssist = document.getElementById('closeAssist');
+const assistBody = document.getElementById('assistBody');
+const assistInput = document.getElementById('assistInput');
+const sendAssist = document.getElementById('sendAssist');
+
+openAssist.addEventListener('click', ()=> openAssistant());
+closeAssist.addEventListener('click', ()=> closeAssistant());
+sendAssist.addEventListener('click', ()=> handleAssist());
+assistInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') handleAssist(); });
+
+function openAssistant(){
+  assistModal.style.display = 'flex';
+  assistModal.setAttribute('aria-hidden','false');
+  assistInput.focus();
+}
+function closeAssistant(){
+  assistModal.style.display = 'none';
+  assistModal.setAttribute('aria-hidden','true');
+  openAssist.focus();
+}
+
+/* Simple "intelligent" simulation: looks up table rows for codes, returns suggested actions */
+function handleAssist(){
+  const q = assistInput.value.trim();
+  if(!q) return;
+  appendUserMsg(q);
+  setTimeout(()=> {
+    const reply = generateReply(q);
+    appendAI(reply);
+  }, 600 + Math.random()*600);
+  assistInput.value = '';
+  assistInput.focus();
+}
+
+function appendUserMsg(text){
+  const d = document.createElement('div'); d.className='msg user'; d.innerText = text;
+  assistBody.appendChild(d);
+  assistBody.scrollTop = assistBody.scrollHeight;
+}
+function appendAI(text){
+  const d = document.createElement('div'); d.className='msg ai'; d.innerText = text;
+  assistBody.appendChild(d);
+  assistBody.scrollTop = assistBody.scrollHeight;
+}
+
+/* Basic local lookup and heuristics */
+function generateReply(text){
+  const q = text.toLowerCase();
+  // Find code-like token in table
+  const tbody = document.getElementById('tableBody');
+  const rows = Array.from(tbody.querySelectorAll('tr')).map(r => {
+    const cells = r.querySelectorAll('td');
+    return {
+      codigo: cells[0].innerText.trim(),
+      tipo: cells[1].innerText.trim(),
+      saldo: Number(cells[2].innerText.trim()),
+      transito: Number(cells[3].innerText.trim()),
+      pendente_ri: Number(cells[4].innerText.trim()),
+      cmm: Number(cells[5].innerText.trim()),
+      status: cells[6].innerText.trim()
+    };
+  });
+
+  // If asks "onde" or "localizar" + code
+  const codeMatch = text.match(/[A-Z]{3,5}-\d{6}/i);
+  if(codeMatch){
+    const code = codeMatch[0].toUpperCase();
+    const item = rows.find(r => r.codigo === code);
+    if(item){
+      let resp = `Localização rápida para ${code}: `;
+      if(item.transito > 0) resp += `Em trânsito (${item.transito} unidades). `;
+      else if(item.saldo > 0) resp += `Disponível em estoque de manutenção (${item.saldo} unidades). `;
+      else resp += `Sem saldo disponível. Pendente RI: ${item.pendente_ri}. `;
+      resp += `Status: ${item.status}. Custo médio de manutenção: ${item.cmm}.`;
+      // Include suggestion if critical
+      if(item.status.toLowerCase().includes('crítico') || item.cmm > 300) {
+        resp += ' Recomendo abrir requisição de compra emergencial e revisar fornecedores.';
+      }
+      return resp;
+    } else {
+      return `Não localizei o código ${code} na tabela visível. Deseja que eu pesquise no histórico completo?`;
+    }
+  }
+
+  // If asks general question like "itens críticos"
+  if(q.includes('crítico') || q.includes('critico') || q.includes('estoque crítico')){
+    const criticals = rows.filter(r => /crítico|critico/i.test(r.status)).map(r => r.codigo);
+    if(criticals.length) return `Identifiquei ${criticals.length} itens críticos: ${criticals.slice(0,6).join(', ')}${criticals.length>6?'...':''}. Posso gerar uma lista exportável.`;
+    return 'Não identifiquei itens críticos na seleção atual.';
+  }
+
+  if(q.includes('sugest') || q.includes('compr') || q.includes('repor') ){
+    return 'Sugestão: Repor itens com saldo < 10 e pendente_ri > 0. Posso gerar ordem de compra inicial baseada em média histórica de consumo.';
+  }
+
+  // fallback
+  return 'Posso ajudar a localizar itens, gerar lista de reposição ou sugerir compras. Ex.: "Localizar ROXR-033849" ou "Gerar lista de itens críticos".';
+}
+
+/* Export visible table to CSV (client-side) */
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const rows = Array.from(document.querySelectorAll('table.data tbody tr')).map(tr => {
+    return Array.from(tr.children).slice(0,7).map(td => td.innerText.replace(/,/g,'.'));
+  });
+  const csv = ['Código,Tipo,Saldo Manut.,Trânsito,Pendente RI,CMM,Status', ...rows.map(r=> r.join(','))].join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'itens_manutencao_export.csv'; document.body.appendChild(a); a.click();
+  a.remove(); URL.revokeObjectURL(url);
+});
+
+/* Simple keyboard accessibility: open assistant with Ctrl+K */
+document.addEventListener('keydown', (e)=>{
+  if(e.ctrlKey && e.key.toLowerCase() === 'k'){ e.preventDefault(); openAssistant(); }
+});
+</script>
+
 </body>
 </html>

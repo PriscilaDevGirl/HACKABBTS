@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIAB - Inteligência Operacional</title>
+  <style>
+    :root {
+      --brand-color-primary-pure: #465EFF;
+      --brand-color-primary-light: #C2D6FF;
+      --brand-color-primary-dark: #262E89;
+
+      --brand-color-secondary-pure: #FCFC30;
+      --highlight-color: #54DCFC;
+
+      --neutral-color-lightest: #FAFAFA;
+      --neutral-color-lighter: #E4E4E7;
+      --neutral-color-light: #D4D4D8;
+      --neutral-color-medium: #71717B;
+      --neutral-color-dark: #3F3F46;
+      --neutral-color-darkest: #09090B;
+
+      --feedback-color-success: #23D80A;
+      --feedback-color-warning: #F99207;
+      --feedback-color-danger: #FF2E3B;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--neutral-color-lightest);
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: var(--neutral-color-darkest);
+      color: #fff;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo {
+      background-color: #fff;
+      color: var(--brand-color-primary-pure);
+      font-weight: bold;
+      font-size: 20px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      margin-bottom: 30px;
+    }
+
+    .sidebar-title {
+      font-size: 12px;
+      color: #ccc;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+    }
+
+    .sidebar-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ccc;
+      font-size: 15px;
+    }
+
+    .sidebar-item.active {
+      background-color: var(--brand-color-primary-pure);
+      color: white;
+    }
+
+    .sidebar-item:hover {
+      background-color: var(--neutral-color-dark);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      font-size: 12px;
+      color: #aaa;
+      border-top: 1px solid #333;
+      padding-top: 15px;
+    }
+
+    /* Main area */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background-color: #fff;
+      border-bottom: 1px solid var(--neutral-color-lighter);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .search-bar {
+      background-color: var(--neutral-color-lightest);
+      border: 1px solid var(--neutral-color-lighter);
+      border-radius: 8px;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 60%;
+    }
+
+    .search-bar input {
+      border: none;
+      outline: none;
+      flex: 1;
+      background: none;
+      font-size: 14px;
+      color: var(--neutral-color-medium);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #465EFF, #262E89);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .content {
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .welcome-section h1 {
+      font-size: 28px;
+      color: var(--neutral-color-darkest);
+    }
+
+    .welcome-section p {
+      color: var(--neutral-color-medium);
+      margin-bottom: 25px;
+    }
+
+    /* Cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-title {
+      font-size: 14px;
+      color: var(--neutral-color-medium);
+      margin-bottom: 10px;
+    }
+
+    .card-value {
+      font-size: 26px;
+      font-weight: bold;
+      color: var(--neutral-color-darkest);
+    }
+
+    .card-change {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+
+    .positive { color: var(--feedback-color-success); }
+    .negative { color: var(--feedback-color-danger); }
+
+    /* Chat Assistente */
+    .assistant-box {
+      margin-top: 40px;
+      background-color: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .assistant-box h2 {
+      color: var(--neutral-color-darkest);
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .assistant-box p {
+      color: var(--neutral-color-medium);
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background-color: var(--brand-color-primary-pure);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background-color: var(--brand-color-primary-dark);
+    }
+
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">BIAB</div>
+    <div class="sidebar-title">Menu</div>
+    <div class="sidebar-item active">📊 Dashboard</div>
+    <div class="sidebar-item">💬 Chat IA</div>
+    <div class="sidebar-item">📦 Meus Itens</div>
+    <div class="sidebar-item">⚙️ Configurações</div>
+    <div class="sidebar-footer">
+      <p><strong>Versão 1.0</strong></p>
+      <p>Powered by Azure AI</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="header">
+      <div class="search-bar">
+        🔍 <input type="text" placeholder="Buscar materiais, status, insights...">
+      </div>
+      <div class="user-info">
+        <div>
+          <div style="font-size: 13px; font-weight: 600;">Usuário BBTS</div>
+          <div style="font-size: 12px; color: var(--neutral-color-medium);">Colaborador</div>
+        </div>
+        <div class="user-avatar">U</div>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="welcome-section">
+        <h1>Bem-vindo à BIAB</h1>
+        <p>Monitoramento inteligente de itens e operações</p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-title">Itens Ativos</div>
+          <div class="card-value">1.238</div>
+          <div class="card-change positive">▲ +4% este mês</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Itens em Trânsito</div>
+          <div class="card-value">62</div>
+          <div class="card-change" style="color:#999;">Estável</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Alertas Recentes</div>
+          <div class="card-value">5</div>
+          <div class="card-change negative">▼ +2 hoje</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Economia Acumulada</div>
+          <div class="card-value">R$ 1.2M</div>
+          <div class="card-change positive">▲ +7%</div>
+        </div>
+      </div>
+
+      <div class="assistant-box">
+        <h2>Assistente IA</h2>
+        <p>Converse com nossa IA para entender indicadores, localizar materiais ou pedir insights.</p>
+        <button class="btn">💬 Iniciar Conversa</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
