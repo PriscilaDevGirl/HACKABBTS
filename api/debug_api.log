@@ -1,0 +1,45 @@
+[2025-10-16 04:31:33] 📁 Recebido arquivo: dados_hackathon.xlsx (xlsx)
+[2025-10-16 04:31:34] ✅ Lidas 5001 linhas de dados válidos
+[2025-10-16 04:31:34] ⚠️ Limitado a 10 linhas para teste (payload reduzido)
+[2025-10-16 04:31:34] ✅ Chave OpenAI detectada: sk-proj-gF...
+[2025-10-16 04:31:56] 🌐 HTTP_CODE: 200
+[2025-10-16 04:31:56] ⚠️ A IA retornou texto não parseável. Head: {
+  "ordered_headers": ["codigo", "abc", "tipo", "saldo_manut", "provid_compras", "recebimento_esperado", "transito_manut", "stage_manut", "recepcao_manut", "pendente_ri", "pecas_teste_kit", "pecas_teste", "fornecedor_reparo", "laboratorio", "wr", "wrcr", "stage_wr", "cmm", "coef_perda"],
+  "mapping": {
+    "codigo": "codigo",
+    "abc": "abc",
+    "tipo": "tipo",
+    "saldo_manut": "saldo_manut",
+    "provid_compras": "provid_compras",
+    "recebimento_esperado": "recebimento_esperado",
+    "tr
+[2025-10-16 04:39:38] 📁 Recebido arquivo: dados_hackathon.xlsx (xlsx)
+[2025-10-16 04:39:39] ✅ Lidas 5001 linhas de dados válidos
+[2025-10-16 04:39:39] ⚠️ Limitado a 10 linhas para teste (payload reduzido)
+[2025-10-16 04:39:39] ✅ Chave OpenAI detectada: sk-proj-gF...
+[2025-10-16 04:39:54] 🌐 HTTP_CODE: 200
+[2025-10-16 04:39:54] ✅ JSON puro detectado e enviado
+[2025-10-16 04:47:50] 📁 Recebido arquivo: dados_hackathon.xlsx (xlsx)
+[2025-10-16 04:47:51] ✅ Lidas 5001 linhas de dados válidos
+[2025-10-16 04:47:51] ⚠️ Limitado a 10 linhas para teste (payload reduzido)
+[2025-10-16 04:47:51] ✅ Chave OpenAI detectada: sk-proj-gF...
+[2025-10-16 04:47:56] 🌐 HTTP_CODE: 200
+[2025-10-16 04:47:56] ✅ JSON puro detectado e enviado
+[2025-10-16 04:54:54] 📁 Recebido arquivo: dados_hackathon.xlsx (xlsx)
+[2025-10-16 04:54:54] ✅ Lidas 5001 linhas de dados válidos
+[2025-10-16 04:54:54] ⚠️ Limitado a 10 linhas para teste (payload reduzido)
+[2025-10-16 04:54:54] ✅ Chave OpenAI detectada: sk-proj-gF...
+[2025-10-16 04:55:02] 🌐 HTTP_CODE: 200
+[2025-10-16 04:55:02] ✅ JSON puro detectado e enviado
+[2025-10-16 05:02:38] 📁 Recebido arquivo: dados_hackathon.xlsx (xlsx)
+[2025-10-16 05:02:38] ✅ Lidas 5001 linhas de dados válidos
+[2025-10-16 05:02:38] ⚠️ Limitado a 10 linhas para teste (payload reduzido)
+[2025-10-16 05:02:38] ✅ Chave OpenAI detectada: sk-proj-gF...
+[2025-10-16 05:02:45] 🌐 HTTP_CODE: 200
+[2025-10-16 05:02:45] ✅ JSON puro detectado e enviado
+[2025-10-16 05:06:54] 📁 Recebido arquivo: dados_hackathon.xlsx (xlsx)
+[2025-10-16 05:06:54] ✅ Lidas 5001 linhas de dados válidos
+[2025-10-16 05:06:54] ⚠️ Limitado a 10 linhas para teste (payload reduzido)
+[2025-10-16 05:06:54] ✅ Chave OpenAI detectada: sk-proj-gF...
+[2025-10-16 05:07:05] 🌐 HTTP_CODE: 200
+[2025-10-16 05:07:05] ✅ JSON puro detectado e enviado

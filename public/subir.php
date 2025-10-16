@@ -1,7 +1,5 @@
 <?php
 // Configuração da API
-define('API_URL', 'https://sua-api.com/upload'); // Substitua pela URL real da sua API
-define('API_KEY', 'sua_chave_de_api'); // Substitua pela sua chave de API
 
 // Função para enviar arquivo para a API
 function sendFileToAPI($filePath, $fileName) {
@@ -11,12 +9,11 @@ function sendFileToAPI($filePath, $fileName) {
     $cfile = new CURLFile($filePath, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $fileName);
     
     // Configurar requisição cURL
-    curl_setopt($ch, CURLOPT_URL, API_URL);
+    curl_setopt($ch, CURLOPT_URL, 'http://localhost/HACKABBTS/api/api_contratacao.php');
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, ['file' => $cfile]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . API_KEY,
         'Content-Type: multipart/form-data'
     ]);
     
@@ -30,6 +27,44 @@ function sendFileToAPI($filePath, $fileName) {
         'success' => $httpCode == 200,
         'response' => $response,
         'httpCode' => $httpCode
+    ];
+}
+
+// Função para gerar JSON padronizado a partir dos dados da API
+function generateStandardizedJSON($apiData) {
+    if (!$apiData || !isset($apiData['data']) || !isset($apiData['data']['mapping']) || !isset($apiData['data']['rows'])) {
+        return null;
+    }
+    
+    $mapping = $apiData['data']['mapping'];
+    $rows = $apiData['data']['rows'];
+    
+    // Criar diretório dados se não existir
+    if (!file_exists('dados')) {
+        mkdir('dados', 0777, true);
+    }
+    
+    // Transformar dados usando o mapeamento
+    $standardizedData = [];
+    foreach ($rows as $row) {
+        $newRow = [];
+        foreach ($row as $key => $value) {
+            // Se a chave original existe no mapping, usar o novo nome
+            if (isset($mapping[$key]) && !empty($mapping[$key])) {
+                $newKey = $mapping[$key];
+                $newRow[$newKey] = $value;
+            }
+        }
+        $standardizedData[] = $newRow;
+    }
+    
+    // Salvar JSON em dados/dados_geral.json
+    $filePath = 'dados/dados_geral.json';
+    file_put_contents($filePath, json_encode($standardizedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+    
+    return [
+        'file_path' => $filePath,
+        'data' => $standardizedData
     ];
 }
 
@@ -50,14 +85,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
         // Enviar para API
         $apiResult = sendFileToAPI($filePath, $fileName);
         
-        // Preparar resposta
-        $response = [
-            'success' => $apiResult['success'],
-            'message' => $apiResult['success'] 
-                ? 'Arquivo enviado com sucesso!' 
-                : 'Erro ao enviar arquivo para API: ' . $apiResult['httpCode'],
-            'details' => $apiResult['response']
-        ];
+        if ($apiResult['success']) {
+            // Decodificar resposta da API
+            $apiData = json_decode($apiResult['response'], true);
+            
+            // Gerar JSON padronizado
+            $jsonResult = generateStandardizedJSON($apiData);
+            
+            // Preparar resposta
+            $response = [
+                'success' => true,
+                'message' => 'Arquivo enviado e JSON padronizado gerado com sucesso!',
+                'api_data' => $apiData,
+                'json_data' => $jsonResult
+            ];
+        } else {
+            $response = [
+                'success' => false,
+                'message' => 'Erro ao enviar arquivo para API: ' . $apiResult['httpCode']
+            ];
+        }
         
         // Remover arquivo temporário
         unlink($filePath);
@@ -412,6 +459,92 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
     .btn:hover {
       background-color: var(--brand-color-primary-dark);
     }
+    
+    /* Resultados da API */
+    .results-section {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-bottom: 30px;
+      display: none;
+    }
+    
+    .results-section h2 {
+      font-size: 22px;
+      color: var(--neutral-color-darkest);
+      margin-bottom: 15px;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--neutral-color-lighter);
+      margin-bottom: 20px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .tab.active {
+      border-bottom-color: var(--brand-color-primary-pure);
+      color: var(--brand-color-primary-pure);
+      font-weight: 600;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .json-viewer {
+      background-color: var(--neutral-color-lightest);
+      border: 1px solid var(--neutral-color-lighter);
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    
+    .action-buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-secondary {
+      background-color: var(--neutral-color-medium);
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--neutral-color-dark);
+    }
+    
+    .mapping-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    
+    .mapping-table th, .mapping-table td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--neutral-color-lighter);
+    }
+    
+    .mapping-table th {
+      background-color: var(--neutral-color-lightest);
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -466,6 +599,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
         <div class="upload-status" id="upload-status"></div>
       </div>
 
+      <div class="results-section" id="results-section">
+        <h2>Resultados do Processamento</h2>
+        
+        <div class="tabs">
+          <div class="tab active" data-tab="mapping">Mapeamento de Campos</div>
+          <div class="tab" data-tab="json">JSON Padronizado</div>
+        </div>
+        
+        <div class="tab-content active" id="mapping-tab">
+          <p>A IA identificou os seguintes campos na sua planilha e os mapeou para o padrão do sistema:</p>
+          <div id="mapping-container"></div>
+        </div>
+        
+        <div class="tab-content" id="json-tab">
+          <p>Dados padronizados gerados a partir da sua planilha:</p>
+          <div class="json-viewer" id="json-viewer"></div>
+        </div>
+        
+        <div class="action-buttons" id="action-buttons">
+          <!-- Botões serão adicionados dinamicamente -->
+        </div>
+      </div>
+
       <div class="cards-grid">
         <div class="card">
           <div class="card-title">Planilhas Enviadas</div>
@@ -508,6 +664,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
       const uploadStatus = document.getElementById('upload-status');
       const progressContainer = document.getElementById('progress-container');
       const progressBar = document.getElementById('progress-bar');
+      const resultsSection = document.getElementById('results-section');
+      const jsonViewer = document.getElementById('json-viewer');
+      const actionButtons = document.getElementById('action-buttons');
+      const mappingContainer = document.getElementById('mapping-container');
+      
+      // Tabs
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabId = tab.getAttribute('data-tab');
+          
+          // Remover classe active de todas as tabs e conteúdos
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
+          
+          // Adicionar classe active na tab e conteúdo selecionados
+          tab.classList.add('active');
+          document.getElementById(tabId + '-tab').classList.add('active');
+        });
+      });
       
       // Evento de clique no botão de upload
       uploadButton.addEventListener('click', () => {
@@ -569,6 +747,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
         progressContainer.style.display = 'block';
         progressBar.style.width = '0%';
         uploadStatus.style.display = 'none';
+        resultsSection.style.display = 'none';
+        actionButtons.innerHTML = '';
         
         // Preparar FormData
         const formData = new FormData();
@@ -591,6 +771,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
               const response = JSON.parse(xhr.responseText);
               if (response.success) {
                 showStatus(response.message, 'success');
+                
+                // Exibir resultados da API e JSON gerado
+                if (response.api_data && response.json_data) {
+                  // Exibir mapeamento
+                  displayMapping(response.api_data.data.mapping);
+                  
+                  // Exibir JSON padronizado
+                  jsonViewer.textContent = JSON.stringify(response.json_data.data, null, 2);
+                  resultsSection.style.display = 'block';
+                  
+                  // Adicionar botão de download
+                  const downloadButton = document.createElement('a');
+                  downloadButton.textContent = 'Baixar JSON';
+                  downloadButton.href = response.json_data.file_path;
+                  downloadButton.download = 'dados_geral.json';
+                  downloadButton.className = 'btn';
+                  
+                  actionButtons.appendChild(downloadButton);
+                }
               } else {
                 showStatus(response.message, 'error');
               }
@@ -613,6 +812,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
         };
         
         xhr.send(formData);
+      }
+      
+      // Função para exibir o mapeamento de campos
+      function displayMapping(mapping) {
+        let tableHTML = '<table class="mapping-table"><thead><tr><th>Campo Original</th><th>Campo Padrão</th></tr></thead><tbody>';
+        
+        for (const [original, standard] of Object.entries(mapping)) {
+          if (standard) { // Apenas exibir campos mapeados
+            tableHTML += `<tr><td>${original}</td><td>${standard}</td></tr>`;
+          }
+        }
+        
+        tableHTML += '</tbody></table>';
+        mappingContainer.innerHTML = tableHTML;
       }
       
       // Função para mostrar status
