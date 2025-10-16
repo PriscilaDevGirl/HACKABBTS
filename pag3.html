@@ -3,256 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BIAB - Inteligência Operacional</title>
+  <title>BIAB – Painel do Planejador</title>
   <style>
     :root {
       --brand-color-primary-pure: #465EFF;
-      --brand-color-primary-light: #C2D6FF;
       --brand-color-primary-dark: #262E89;
-
-      --brand-color-secondary-pure: #FCFC30;
-      --highlight-color: #54DCFC;
-
       --neutral-color-lightest: #FAFAFA;
       --neutral-color-lighter: #E4E4E7;
-      --neutral-color-light: #D4D4D8;
       --neutral-color-medium: #71717B;
-      --neutral-color-dark: #3F3F46;
       --neutral-color-darkest: #09090B;
-
       --feedback-color-success: #23D80A;
       --feedback-color-warning: #F99207;
       --feedback-color-danger: #FF2E3B;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--neutral-color-lightest);
-      display: flex;
-      height: 100vh;
-    }
-
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',sans-serif;background:var(--neutral-color-lightest);display:flex;min-height:100vh;}
     /* Sidebar */
-    .sidebar {
-      width: 250px;
-      background-color: var(--neutral-color-darkest);
-      color: #fff;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .logo {
-      background-color: #fff;
-      color: var(--brand-color-primary-pure);
-      font-weight: bold;
-      font-size: 20px;
-      height: 45px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      margin-bottom: 30px;
-    }
-
-    .sidebar-title {
-      font-size: 12px;
-      color: #ccc;
-      text-transform: uppercase;
-      margin-bottom: 15px;
-    }
-
-    .sidebar-item {
-      padding: 12px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #ccc;
-      font-size: 15px;
-    }
-
-    .sidebar-item.active {
-      background-color: var(--brand-color-primary-pure);
-      color: white;
-    }
-
-    .sidebar-item:hover {
-      background-color: var(--neutral-color-dark);
-    }
-
-    .sidebar-footer {
-      margin-top: auto;
-      font-size: 12px;
-      color: #aaa;
-      border-top: 1px solid #333;
-      padding-top: 15px;
-    }
-
-    /* Main area */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .header {
-      background-color: #fff;
-      border-bottom: 1px solid var(--neutral-color-lighter);
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .search-bar {
-      background-color: var(--neutral-color-lightest);
-      border: 1px solid var(--neutral-color-lighter);
-      border-radius: 8px;
-      padding: 10px 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 60%;
-    }
-
-    .search-bar input {
-      border: none;
-      outline: none;
-      flex: 1;
-      background: none;
-      font-size: 14px;
-      color: var(--neutral-color-medium);
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .user-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #465EFF, #262E89);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-    }
-
-    .content {
-      padding: 30px;
-      overflow-y: auto;
-    }
-
-    .welcome-section h1 {
-      font-size: 28px;
-      color: var(--neutral-color-darkest);
-    }
-
-    .welcome-section p {
-      color: var(--neutral-color-medium);
-      margin-bottom: 25px;
-    }
-
+    .sidebar{width:260px;background:var(--neutral-color-darkest);color:#fff;display:flex;flex-direction:column;padding:20px;}
+    .logo{background:#fff;color:var(--brand-color-primary-pure);font-weight:bold;font-size:22px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:8px;margin-bottom:30px;}
+    .sidebar-item{padding:12px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px;color:#ccc;font-size:15px;transition:background 0.2s;}
+    .sidebar-item:hover{background:rgba(255,255,255,0.08);}
+    .sidebar-item.active{background:var(--brand-color-primary-pure);color:white;}
+    .sidebar-footer{margin-top:auto;font-size:12px;color:#aaa;border-top:1px solid #333;padding-top:20px;}
+    /* Main */
+    .main{flex:1;display:flex;flex-direction:column;}
+    .header{background:#fff;border-bottom:1px solid var(--neutral-color-lighter);padding:15px 30px;display:flex;justify-content:space-between;align-items:center;}
+    .search-bar{background:var(--neutral-color-lightest);border:1px solid var(--neutral-color-lighter);border-radius:8px;padding:10px 15px;display:flex;align-items:center;gap:10px;width:60%;}
+    .search-bar input{border:none;outline:none;background:none;flex:1;font-size:14px;color:var(--neutral-color-medium);}
+    .user-info{display:flex;align-items:center;gap:12px;}
+    .user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#465EFF,#262E89);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;}
+    .content{padding:30px;overflow-y:auto;}
+    h1{font-size:26px;margin-bottom:10px;color:var(--neutral-color-darkest);}
+    p{color:var(--neutral-color-medium);}
     /* Cards */
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      background-color: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      transition: 0.3s;
-    }
-
-    .card:hover {
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    }
-
-    .card-title {
-      font-size: 14px;
-      color: var(--neutral-color-medium);
-      margin-bottom: 10px;
-    }
-
-    .card-value {
-      font-size: 26px;
-      font-weight: bold;
-      color: var(--neutral-color-darkest);
-    }
-
-    .card-change {
-      font-size: 13px;
-      font-weight: 600;
-      margin-top: 5px;
-    }
-
-    .positive { color: var(--feedback-color-success); }
-    .negative { color: var(--feedback-color-danger); }
-
-    /* Chat Assistente */
-    .assistant-box {
-      margin-top: 40px;
-      background-color: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-
-    .assistant-box h2 {
-      color: var(--neutral-color-darkest);
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-
-    .assistant-box p {
-      color: var(--neutral-color-medium);
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      background-color: var(--brand-color-primary-pure);
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .btn:hover {
-      background-color: var(--brand-color-primary-dark);
-    }
-
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:30px;}
+    .card{background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+    .card-title{font-size:14px;color:var(--neutral-color-medium);}
+    .card-value{font-size:24px;font-weight:bold;color:var(--neutral-color-darkest);}
+    .positive{color:var(--feedback-color-success);}
+    .negative{color:var(--feedback-color-danger);}
+    .table-section{background:#fff;border-radius:10px;padding:25px;box-shadow:0 2px 8px rgba(0,0,0,0.1);margin-top:30px;}
+    table{width:100%;border-collapse:collapse;}
+    table th,table td{padding:12px 15px;text-align:left;border-bottom:1px solid var(--neutral-color-lighter);}
+    table th{background:var(--neutral-color-lightest);font-weight:600;color:var(--neutral-color-medium);}
+    tr:hover{background:var(--neutral-color-lighter);}
+    .status-badge{padding:5px 10px;border-radius:6px;font-size:13px;font-weight:600;display:inline-block;}
+    .status-critical{background:#ffe5e5;color:var(--feedback-color-danger);}
+    .status-warning{background:#fff7e5;color:var(--feedback-color-warning);}
+    .status-normal{background:#e8f5e9;color:var(--feedback-color-success);}
   </style>
 </head>
 <body>
   <aside class="sidebar">
     <div class="logo">BIAB</div>
-    <div class="sidebar-title">Menu</div>
-    <div class="sidebar-item active">📊 Dashboard</div>
-    <div class="sidebar-item">💬 Chat IA</div>
-    <div class="sidebar-item">📦 Meus Itens</div>
-    <div class="sidebar-item">⚙️ Configurações</div>
+    <div class="sidebar-item active" data-page="dashboard">📊 Dashboard</div>
+    <div class="sidebar-item" data-page="estoque">📦 Estoque</div>
+    <div class="sidebar-item" data-page="faltas">⚠ Itens em Falta</div>
+    <div class="sidebar-item" data-page="chat">💬 Chat IA</div>
     <div class="sidebar-footer">
       <p><strong>Versão 1.0</strong></p>
       <p>Powered by Azure AI</p>
@@ -261,56 +68,88 @@
 
   <main class="main">
     <header class="header">
-      <div class="search-bar">
-        🔍 <input type="text" placeholder="Buscar materiais, status, insights...">
-      </div>
+      <div class="search-bar">🔍 <input type="text" placeholder="Buscar materiais..." /></div>
       <div class="user-info">
         <div>
-          <div style="font-size: 13px; font-weight: 600;">Usuário BBTS</div>
-          <div style="font-size: 12px; color: var(--neutral-color-medium);">Colaborador</div>
+          <div style="font-size:13px;font-weight:600;">Planejador BBTS</div>
+          <div style="font-size:12px;color:var(--neutral-color-medium);">Setor Operacional</div>
         </div>
-        <div class="user-avatar">U</div>
+        <div class="user-avatar">P</div>
       </div>
     </header>
 
-    <section class="content">
-      <div class="welcome-section">
-        <h1>Bem-vindo à BIAB</h1>
-        <p>Monitoramento inteligente de itens e operações</p>
-      </div>
-
+    <section class="content" id="content">
+      <!-- Conteúdo padrão -->
+      <h1>Painel do Planejador</h1>
+      <p>Visão geral do estoque e status de materiais.</p>
       <div class="cards-grid">
-        <div class="card">
-          <div class="card-title">Itens Ativos</div>
-          <div class="card-value">1.238</div>
-          <div class="card-change positive">▲ +4% este mês</div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Itens em Trânsito</div>
-          <div class="card-value">62</div>
-          <div class="card-change" style="color:#999;">Estável</div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Alertas Recentes</div>
-          <div class="card-value">5</div>
-          <div class="card-change negative">▼ +2 hoje</div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Economia Acumulada</div>
-          <div class="card-value">R$ 1.2M</div>
-          <div class="card-change positive">▲ +7%</div>
-        </div>
-      </div>
-
-      <div class="assistant-box">
-        <h2>Assistente IA</h2>
-        <p>Converse com nossa IA para entender indicadores, localizar materiais ou pedir insights.</p>
-        <button class="btn">💬 Iniciar Conversa</button>
+        <div class="card"><div class="card-title">Total em Estoque</div><div class="card-value">4.520</div><p>Estável</p></div>
+        <div class="card"><div class="card-title">Itens em Falta</div><div class="card-value negative">123</div><p class="negative">+10 hoje</p></div>
+        <div class="card"><div class="card-title">Itens em Trânsito</div><div class="card-value positive">58</div><p class="positive">+5%</p></div>
+        <div class="card"><div class="card-title">Economia Estimada</div><div class="card-value positive">R$ 2.45M</div><p class="positive">+12%</p></div>
       </div>
     </section>
   </main>
+
+  <script>
+    const pages = {
+      dashboard: `
+        <h1>Painel do Planejador</h1>
+        <p>Visão geral do estoque e status de materiais.</p>
+        <div class="cards-grid">
+          <div class="card"><div class="card-title">Total em Estoque</div><div class="card-value">4.520</div><p>Estável</p></div>
+          <div class="card"><div class="card-title">Itens em Falta</div><div class="card-value negative">123</div><p class="negative">+10 hoje</p></div>
+          <div class="card"><div class="card-title">Itens em Trânsito</div><div class="card-value positive">58</div><p class="positive">+5%</p></div>
+          <div class="card"><div class="card-title">Economia Estimada</div><div class="card-value positive">R$ 2.45M</div><p class="positive">+12%</p></div>
+        </div>
+      `,
+      estoque: `
+        <h1>Estoque Geral</h1>
+        <p>Lista completa de itens disponíveis e em trânsito.</p>
+        <div class="table-section">
+          <table>
+            <thead><tr><th>Código</th><th>Saldo</th><th>Trânsito</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>FOAR-068153</td><td>1723</td><td>0</td><td><span class="status-badge status-normal">Normal</span></td></tr>
+              <tr><td>QOUR-092468</td><td>3176</td><td>50</td><td><span class="status-badge status-warning">Atenção</span></td></tr>
+              <tr><td>BOKR-092826</td><td>1307</td><td>27</td><td><span class="status-badge status-critical">Crítico</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      `,
+      faltas: `
+        <h1>Itens em Falta</h1>
+        <p>Itens com estoque crítico ou zerado.</p>
+        <div class="table-section">
+          <table>
+            <thead><tr><th>Código</th><th>Saldo</th><th>Falta</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>ROXR-033849</td><td>0</td><td>10</td><td><span class="status-badge status-critical">Crítico</span></td></tr>
+              <tr><td>BOQR-033678</td><td>5</td><td>20</td><td><span class="status-badge status-warning">Atenção</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      `,
+      chat: `
+        <h1>Assistente IA</h1>
+        <p>Converse com nossa IA para localizar itens, verificar faltas ou prever necessidades.</p>
+        <div class="table-section" style="text-align:center;">
+          <button class="status-badge" style="background:#465EFF;color:#fff;">💬 Iniciar Chat</button>
+        </div>
+      `
+    };
+
+    const content = document.getElementById('content');
+    const menuItems = document.querySelectorAll('.sidebar-item');
+
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        menuItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        const page = item.getAttribute('data-page');
+        content.innerHTML = pages[page];
+      });
+    });
+  </script>
 </body>
 </html>
