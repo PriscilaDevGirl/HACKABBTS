@@ -118,8 +118,8 @@ for ($i = 1; $i < count($rows); $i++) {
     }
 }
 
-// === LIMITAR A 10 LINHAS PARA TESTE ===
- $MAX_ROWS = 10;
+// === LIMITAR A 20 LINHAS PARA TESTE (aumentado para melhor análise) ===
+ $MAX_ROWS = 20;
 if (count($data) > $MAX_ROWS) {
     $data = array_slice($data, 0, $MAX_ROWS);
     log_debug("⚠️ Limitado a $MAX_ROWS linhas para teste (payload reduzido)");
@@ -145,16 +145,15 @@ log_debug("✅ Chave OpenAI detectada: " . substr($apiKey, 0, 10) . "...");
 
 // === PADRÃO DE CAMPOS DE REFERÊNCIA ===
  $padraoCampos = [
-    "id_contrato",
-    "nome_funcionario",
-    "cpf",
-    "cargo",
-    "setor",
-    "data_admissao",
-    "salario",
-    "tipo_contrato",
-    "status",
-    "observacao"
+    "saldo_manut",
+    "tipo",
+    "codigo",
+    "cmm",
+    "pecas_teste_kit",
+    "coef_perda",
+    "laboratorio",
+    "wr",
+    "stage_wr"
 ];
 
 // === PROMPT DE REORDENAÇÃO ===
@@ -182,7 +181,7 @@ Colunas encontradas:
 " . json_encode($headers, JSON_UNESCAPED_UNICODE) . "
 
 Linhas de exemplo:
-" . json_encode(array_slice($data, 0, 3), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . "
+" . json_encode(array_slice($data, 0, 5), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . "
 
 ⚠️ Retorne APENAS o JSON puro, sem markdown, texto extra, nem ```.";
 
@@ -190,7 +189,7 @@ Linhas de exemplo:
  $payload = [
     "model" => "gpt-4o-mini",
     "messages" => [
-        ["role" => "system", "content" => "Você é um especialista em reorganizar colunas de planilhas e retornar JSON puro."],
+        ["role" => "system", "content" => "Você é um especialista em reorganizar colunas de planilhas e retornar JSON puro. Seu foco é trabalhar com campos de manutenção como saldo_manut, tipo, codigo, cmm, pecas_teste_kit, coef_perda, laboratorio, wr e stage_wr."],
         ["role" => "user", "content" => $prompt]
     ],
     "temperature" => 0.0,

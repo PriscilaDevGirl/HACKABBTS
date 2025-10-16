@@ -1,6 +1,52 @@
 <?php
 // Configuração da API
 
+// Função para ler XLSX sem bibliotecas
+function lerExcelXLSX($arquivo) {
+    $zip = new ZipArchive;
+    if ($zip->open($arquivo) === true) {
+        $xmlString = $zip->getFromName('xl/worksheets/sheet1.xml');
+        if (!$xmlString) {
+            // Tenta sheet2 se sheet1 não existir
+            $xmlString = $zip->getFromName('xl/worksheets/sheet2.xml');
+            if (!$xmlString) {
+                $zip->close();
+                return [];
+            }
+        }
+        
+        $sharedStrings = [];
+        if ($zip->locateName('xl/sharedStrings.xml') !== false) {
+            $shared = simplexml_load_string($zip->getFromName('xl/sharedStrings.xml'));
+            foreach ($shared->si as $item) {
+                if (isset($item->t)) {
+                    $sharedStrings[] = (string)$item->t;
+                } else {
+                    $sharedStrings[] = trim(preg_replace('/\s+/', ' ', strip_tags($item->asXML())));
+                }
+            }
+        }
+        
+        $sheet = simplexml_load_string($xmlString);
+        $rows = [];
+        foreach ($sheet->sheetData->row as $row) {
+            $r = [];
+            foreach ($row->c as $c) {
+                $t = (string)$c['t'];
+                $v = (string)$c->v;
+                if ($t === 's') {
+                    $v = $sharedStrings[(int)$v] ?? '';
+                }
+                $r[] = $v;
+            }
+            $rows[] = $r;
+        }
+        $zip->close();
+        return $rows;
+    }
+    return [];
+}
+
 // Função para enviar arquivo para a API
 function sendFileToAPI($filePath, $fileName) {
     $ch = curl_init();
@@ -31,23 +77,26 @@ function sendFileToAPI($filePath, $fileName) {
 }
 
 // Função para gerar JSON padronizado a partir dos dados da API
-function generateStandardizedJSON($apiData) {
-    if (!$apiData || !isset($apiData['data']) || !isset($apiData['data']['mapping']) || !isset($apiData['data']['rows'])) {
+function generateStandardizedJSON($apiData, $allData) {
+    // Verificar se a resposta da API é válida
+    if (!$apiData || !isset($apiData['mapping']) || !isset($apiData['ordered_headers'])) {
         return null;
     }
     
-    $mapping = $apiData['data']['mapping'];
-    $rows = $apiData['data']['rows'];
+    $mapping = $apiData['mapping'];
+    $orderedHeaders = $apiData['ordered_headers'];
     
     // Criar diretório dados se não existir
     if (!file_exists('dados')) {
         mkdir('dados', 0777, true);
     }
     
-    // Transformar dados usando o mapeamento
+    // Transformar dados usando o mapeamento e garantir todas as colunas do padrão
     $standardizedData = [];
-    foreach ($rows as $row) {
+    foreach ($allData as $row) {
         $newRow = [];
+        
+        // Primeiro, mapear as colunas existentes
         foreach ($row as $key => $value) {
             // Se a chave original existe no mapping, usar o novo nome
             if (isset($mapping[$key]) && !empty($mapping[$key])) {
@@ -55,7 +104,21 @@ function generateStandardizedJSON($apiData) {
                 $newRow[$newKey] = $value;
             }
         }
-        $standardizedData[] = $newRow;
+        
+        // Garantir que todas as colunas do padrão estejam presentes
+        foreach ($orderedHeaders as $header) {
+            if (!isset($newRow[$header])) {
+                $newRow[$header] = null; // Preencher com null se não existir
+            }
+        }
+        
+        // Reordenar as colunas conforme o padrão
+        $orderedRow = [];
+        foreach ($orderedHeaders as $header) {
+            $orderedRow[$header] = $newRow[$header];
+        }
+        
+        $standardizedData[] = $orderedRow;
     }
     
     // Salvar JSON em dados/dados_geral.json
@@ -64,7 +127,8 @@ function generateStandardizedJSON($apiData) {
     
     return [
         'file_path' => $filePath,
-        'data' => $standardizedData
+        'data' => $standardizedData,
+        'total_rows' => count($standardizedData)
     ];
 }
 
@@ -82,28 +146,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
     
     // Mover arquivo temporário
     if (move_uploaded_file($_FILES['excel_file']['tmp_name'], $filePath)) {
-        // Enviar para API
-        $apiResult = sendFileToAPI($filePath, $fileName);
-        
-        if ($apiResult['success']) {
-            // Decodificar resposta da API
-            $apiData = json_decode($apiResult['response'], true);
-            
-            // Gerar JSON padronizado
-            $jsonResult = generateStandardizedJSON($apiData);
-            
-            // Preparar resposta
-            $response = [
-                'success' => true,
-                'message' => 'Arquivo enviado e JSON padronizado gerado com sucesso!',
-                'api_data' => $apiData,
-                'json_data' => $jsonResult
-            ];
-        } else {
+        // Ler o arquivo XLSX completo
+        $allRows = lerExcelXLSX($filePath);
+        if (empty($allRows)) {
             $response = [
                 'success' => false,
-                'message' => 'Erro ao enviar arquivo para API: ' . $apiResult['httpCode']
+                'message' => 'Erro ao ler o arquivo XLSX.'
             ];
+        } else {
+            // Construir dataset completo
+            $headers = array_map('trim', $allRows[0]);
+            $allData = [];
+            for ($i = 1; $i < count($allRows); $i++) {
+                $linha = [];
+                foreach ($headers as $index => $coluna) {
+                    if ($coluna !== '') {
+                        $linha[$coluna] = $allRows[$i][$index] ?? null;
+                    }
+                }
+                if (array_filter($linha)) {
+                    $allData[] = $linha;
+                }
+            }
+            
+            // Enviar para API (que vai processar apenas as primeiras 100 linhas para definir o mapeamento)
+            $apiResult = sendFileToAPI($filePath, $fileName);
+            
+            if ($apiResult['success']) {
+                // Decodificar resposta da API
+                $apiData = json_decode($apiResult['response'], true);
+                
+                // Gerar JSON padronizado com todos os dados
+                $jsonResult = generateStandardizedJSON($apiData, $allData);
+                
+                // Preparar resposta
+                $response = [
+                    'success' => true,
+                    'message' => 'Arquivo enviado e JSON padronizado gerado com sucesso!',
+                    'api_data' => $apiData,
+                    'json_data' => $jsonResult
+                ];
+            } else {
+                $response = [
+                    'success' => false,
+                    'message' => 'Erro ao enviar arquivo para API: ' . $apiResult['httpCode'],
+                    'response' => $apiResult['response']
+                ];
+            }
         }
         
         // Remover arquivo temporário
@@ -545,6 +634,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
       background-color: var(--neutral-color-lightest);
       font-weight: 600;
     }
+    
+    .stats-container {
+      display: flex;
+      gap: 20px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .stat-box {
+      background-color: var(--neutral-color-lightest);
+      border-radius: 8px;
+      padding: 15px;
+      flex: 1;
+    }
+    
+    .stat-title {
+      font-size: 14px;
+      color: var(--neutral-color-medium);
+      margin-bottom: 5px;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--neutral-color-darkest);
+    }
   </style>
 </head>
 <body>
@@ -601,6 +716,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
 
       <div class="results-section" id="results-section">
         <h2>Resultados do Processamento</h2>
+        
+        <div class="stats-container">
+          <div class="stat-box">
+            <div class="stat-title">Total de Linhas Processadas</div>
+            <div class="stat-value" id="total-rows">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-title">Colunas Mapeadas</div>
+            <div class="stat-value" id="mapped-columns">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-title">Arquivo Gerado</div>
+            <div class="stat-value" id="file-size">0 KB</div>
+          </div>
+        </div>
         
         <div class="tabs">
           <div class="tab active" data-tab="mapping">Mapeamento de Campos</div>
@@ -668,6 +798,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
       const jsonViewer = document.getElementById('json-viewer');
       const actionButtons = document.getElementById('action-buttons');
       const mappingContainer = document.getElementById('mapping-container');
+      const totalRowsElement = document.getElementById('total-rows');
+      const mappedColumnsElement = document.getElementById('mapped-columns');
+      const fileSizeElement = document.getElementById('file-size');
       
       // Tabs
       const tabs = document.querySelectorAll('.tab');
@@ -735,6 +868,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
         }
       }, false);
       
+      // Função para formatar tamanho do arquivo
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+      
       // Função para processar o arquivo
       function handleFile(file) {
         // Verificar se é um arquivo Excel
@@ -774,8 +916,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
                 
                 // Exibir resultados da API e JSON gerado
                 if (response.api_data && response.json_data) {
+                  // Exibir estatísticas
+                  if (response.json_data.total_rows) {
+                    totalRowsElement.textContent = response.json_data.total_rows;
+                  }
+                  
+                  if (response.api_data.mapping) {
+                    const mappedCount = Object.keys(response.api_data.mapping).length;
+                    mappedColumnsElement.textContent = mappedCount;
+                  }
+                  
+                  if (response.json_data.file_path) {
+                    // Calcular tamanho do arquivo
+                    fetch(response.json_data.file_path)
+                      .then(response => response.blob())
+                      .then(blob => {
+                        fileSizeElement.textContent = formatFileSize(blob.size);
+                      })
+                      .catch(error => {
+                        fileSizeElement.textContent = 'Não disponível';
+                      });
+                  }
+                  
                   // Exibir mapeamento
-                  displayMapping(response.api_data.data.mapping);
+                  displayMapping(response.api_data.mapping);
                   
                   // Exibir JSON padronizado
                   jsonViewer.textContent = JSON.stringify(response.json_data.data, null, 2);
@@ -792,9 +956,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
                 }
               } else {
                 showStatus(response.message, 'error');
+                // Exibir detalhes do erro se disponível
+                if (response.response) {
+                  console.error('Resposta da API:', response.response);
+                }
               }
             } catch (e) {
-              showStatus('Erro ao processar resposta do servidor', 'error');
+              showStatus('Erro ao processar resposta do servidor: ' + e.message, 'error');
+              console.error('Erro ao processar JSON:', e);
+              console.error('Resposta bruta:', xhr.responseText);
             }
           } else {
             showStatus('Erro no servidor: ' + xhr.status, 'error');
