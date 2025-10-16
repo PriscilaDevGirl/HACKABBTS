@@ -3,29 +3,43 @@
  * dashboard_bbaib.php
  * Versão sem banco de dados
  * Lê os arquivos JSON:
- *   - catalogo_prefixos.json
- *   - catalogo_sap_bbts.json
+ *   - ../dados/catalogo_prefixos.json
+ *   - ../dados/catalogo_sap_bbts.json
  *****************************************************/
 
 header('Content-Type: text/html; charset=utf-8');
 
-// ===== Carregar JSON =====
+/* ===== Função para carregar JSON ===== */
 function carregarJSON($arquivo) {
     if (!file_exists($arquivo)) {
         echo "<h3 style='color:red'>❌ Arquivo não encontrado: {$arquivo}</h3>";
         return [];
     }
+
     $conteudo = file_get_contents($arquivo);
     $dados = json_decode($conteudo, true);
-    if (!is_array($dados)) {
-        echo "<h3 style='color:red'>❌ Erro ao ler JSON: {$arquivo}</h3>";
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        echo "<h3 style='color:red'>❌ Erro ao ler JSON ({$arquivo}): " . json_last_error_msg() . "</h3>";
         return [];
     }
+
     return $dados;
 }
 
-$prefixos = carregarJSON(__DIR__ . "../dados/catalogo_prefixos.json");
-$catalogo = carregarJSON(__DIR__ . "../dados/catalogo_sap_bbts.json");
+/* ===== Caminho base ===== */
+$basePath = realpath(__DIR__ . '/../dados');
+if (!$basePath) {
+    echo "<h3 style='color:red'>❌ Caminho base inválido. Verifique estrutura de pastas.</h3>";
+    exit;
+}
+
+/* ===== Carregar arquivos ===== */
+$prefixos_json = carregarJSON($basePath . '/catalogo_prefixos.json');
+$prefixos = $prefixos_json['catalogo_prefixos'] ?? $prefixos_json; // compatível com JSON com ou sem raiz
+
+$catalogo_json = carregarJSON($basePath . '/catalogo_sap_bbts.json');
+$catalogo = $catalogo_json['catalogo_sap_bbts'] ?? $catalogo_json;
 ?>
 
 <!DOCTYPE html>
@@ -104,10 +118,26 @@ footer {
     display: block;
   }
 }
+.debug {
+  background: #fffbea;
+  color: #92400e;
+  padding: 8px;
+  margin: 10px auto;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  font-size: 13px;
+  max-width: 1100px;
+}
 </style>
 </head>
 <body>
 <header>📘 Catálogo BBTS - Descrições e Prefixos</header>
+
+<div class="debug">
+  Caminho base: <b><?= htmlspecialchars($basePath) ?></b><br>
+  Prefixos carregados: <b><?= count($prefixos) ?></b> registros<br>
+  Catálogo SAP carregado: <b><?= count($catalogo) ?></b> registros
+</div>
 
 <div class="container">
   <h2>📗 Prefixos de Materiais</h2>
@@ -121,14 +151,18 @@ footer {
       </tr>
     </thead>
     <tbody>
-      <?php foreach ($prefixos as $p): ?>
-      <tr>
-        <td data-label="Prefixo"><?= htmlspecialchars($p['prefixo'] ?? '') ?></td>
-        <td data-label="Descrição"><?= htmlspecialchars($p['descricao'] ?? '') ?></td>
-        <td data-label="Função"><?= htmlspecialchars($p['funcao_operacional'] ?? '') ?></td>
-        <td data-label="Exemplo"><?= htmlspecialchars($p['exemplo_uso'] ?? '') ?></td>
-      </tr>
-      <?php endforeach; ?>
+      <?php if (empty($prefixos)): ?>
+        <tr><td colspan="4">Nenhum registro encontrado no JSON.</td></tr>
+      <?php else: ?>
+        <?php foreach ($prefixos as $p): ?>
+        <tr>
+          <td data-label="Prefixo"><?= htmlspecialchars($p['prefixo'] ?? '') ?></td>
+          <td data-label="Descrição"><?= htmlspecialchars($p['descricao'] ?? '') ?></td>
+          <td data-label="Função"><?= htmlspecialchars($p['funcao_operacional'] ?? '') ?></td>
+          <td data-label="Exemplo"><?= htmlspecialchars($p['exemplo_uso'] ?? '') ?></td>
+        </tr>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </tbody>
   </table>
 </div>
@@ -146,15 +180,19 @@ footer {
       </tr>
     </thead>
     <tbody>
-      <?php foreach ($catalogo as $c): ?>
-      <tr>
-        <td data-label="Código"><?= htmlspecialchars($c['codigo'] ?? '') ?></td>
-        <td data-label="Tipo"><?= htmlspecialchars($c['tipo'] ?? '') ?></td>
-        <td data-label="Descrição"><?= htmlspecialchars($c['descricao_funcional'] ?? '') ?></td>
-        <td data-label="Finalidade"><?= htmlspecialchars($c['finalidade'] ?? '') ?></td>
-        <td data-label="Exemplo"><?= htmlspecialchars($c['exemplo_pratico'] ?? '') ?></td>
-      </tr>
-      <?php endforeach; ?>
+      <?php if (empty($catalogo)): ?>
+        <tr><td colspan="5">Nenhum registro encontrado no JSON.</td></tr>
+      <?php else: ?>
+        <?php foreach ($catalogo as $c): ?>
+        <tr>
+          <td data-label="Código"><?= htmlspecialchars($c['codigo'] ?? '') ?></td>
+          <td data-label="Tipo"><?= htmlspecialchars($c['tipo'] ?? '') ?></td>
+          <td data-label="Descrição"><?= htmlspecialchars($c['descricao_funcional'] ?? '') ?></td>
+          <td data-label="Finalidade"><?= htmlspecialchars($c['finalidade'] ?? '') ?></td>
+          <td data-label="Exemplo"><?= htmlspecialchars($c['exemplo_pratico'] ?? '') ?></td>
+        </tr>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </tbody>
   </table>
 </div>
